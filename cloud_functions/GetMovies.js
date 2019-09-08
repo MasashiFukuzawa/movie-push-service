@@ -27,7 +27,7 @@ function getMovies() {
     const title = a.textContent;
     const href = a.href;
 
-    const casts = getCasts(movie);
+    const casts = await page.evaluate(getCasts(movie));
     const description = movie.querySelector('.txt').textContent;
 
     return {title, href, casts, description};
