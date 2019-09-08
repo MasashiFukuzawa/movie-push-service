@@ -27,19 +27,24 @@ function getMovies() {
     const title = a.textContent;
     const href = a.href;
 
-    let cast_list = movie.querySelector('ul.cast-staff > li:nth-child(2)');
-    if (!cast_list) {
-      cast_list = movie.querySelector('ul.cast-staff > li:nth-child(1)');
-    }
-    const cast1 = cast_list.querySelector('span:nth-child(1)') ? cast_list.querySelector('span:nth-child(1)').textContent : '';
-    const cast2 = cast_list.querySelector('span:nth-child(2)') ? cast_list.querySelector('span:nth-child(2)').textContent : '';
-    const cast3 = cast_list.querySelector('span:nth-child(3)') ? cast_list.querySelector('span:nth-child(3)').textContent : '';
-    const cast4 = cast_list.querySelector('span:nth-child(4)') ? cast_list.querySelector('span:nth-child(4)').textContent : '';
-    const cast5 = cast_list.querySelector('span:nth-child(5)') ? cast_list.querySelector('span:nth-child(5)').textContent : '';
-    const casts = {cast1, cast2, cast3, cast4, cast5}
-
+    const casts = getCasts(movie);
     const description = movie.querySelector('.txt').textContent;
 
     return {title, href, casts, description};
   });
+}
+
+function getCasts(movie) {
+  let cast_list = movie.querySelector('ul.cast-staff > li:nth-child(2)');
+  if (!cast_list) {
+    cast_list = movie.querySelector('ul.cast-staff > li:nth-child(1)');
+  }
+  const cast1 = cast_list.querySelector('span:nth-child(1)') ? cast_list.querySelector('span:nth-child(1)').textContent : '';
+  const cast2 = cast_list.querySelector('span:nth-child(2)') ? cast_list.querySelector('span:nth-child(2)').textContent : '';
+  const cast3 = cast_list.querySelector('span:nth-child(3)') ? cast_list.querySelector('span:nth-child(3)').textContent : '';
+  const cast4 = cast_list.querySelector('span:nth-child(4)') ? cast_list.querySelector('span:nth-child(4)').textContent : '';
+  const cast5 = cast_list.querySelector('span:nth-child(5)') ? cast_list.querySelector('span:nth-child(5)').textContent : '';
+
+  const casts = {cast1, cast2, cast3, cast4, cast5};
+  return casts;
 }
