@@ -13,7 +13,20 @@ exports.getMovies = async (req, res) => {
     page = await getBrowserPage();
   }
 
-  await page.goto('https://eiga.com/coming/');
+  const url = 'https://eiga.com/coming/';
+  await page.goto(url, {waitUntil: 'load'});
+
+  await page._client.send(
+    'Input.synthesizeScrollGesture',
+    {
+      x: 0,
+      y: 0,
+      xDistance: 0,
+      yDistance: -1000,
+      repeatCount: 15,
+      repeatDelayMs: 1,
+    }
+  );
 
   const result = await page.evaluate(getMovies);
 
@@ -24,6 +37,8 @@ exports.getMovies = async (req, res) => {
 function getMovies() {
   const base_section = document.querySelector('section');
   const elements = base_section.children;
+  // LINEに通知したかどうかのフラグ
+  const line_flag = 0;
 
   let movies = [];
   for (let i = 0; i < elements.length; i++) {
@@ -36,19 +51,21 @@ function getMovies() {
       let title = a.textContent;
       let href = a.href;
 
+      // キャストを5人分取得
       let cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(2)');
       if (!cast_list) {
         cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(1)');
       }
-      let cast1 = cast_list.querySelector('span:nth-child(1)') ? cast_list.querySelector('span:nth-child(1)').textContent : '';
-      let cast2 = cast_list.querySelector('span:nth-child(2)') ? cast_list.querySelector('span:nth-child(2)').textContent : '';
-      let cast3 = cast_list.querySelector('span:nth-child(3)') ? cast_list.querySelector('span:nth-child(3)').textContent : '';
-      let cast4 = cast_list.querySelector('span:nth-child(4)') ? cast_list.querySelector('span:nth-child(4)').textContent : '';
-      let cast5 = cast_list.querySelector('span:nth-child(5)') ? cast_list.querySelector('span:nth-child(5)').textContent : '';
-      let casts = {cast1, cast2, cast3, cast4, cast5};
+      let casts = [];
+      for (let i = 1; i <= 5; i++) {
+        let cast = cast_list.querySelector(`span:nth-child(${i})`) ? cast_list.querySelector(`span:nth-child(${i})`).textContent : '';
+        casts.push(cast);
+      }
 
       let description = elements[i].querySelector('.txt').textContent;
-      let movie = {release_date, title, href, casts, description};
+      let src = elements[i].querySelector('.img-box > a > img').src;
+
+      let movie = {release_date, title, href, ...casts, description, src, line_flag};
       movies.push(movie);
       this.movies = movies
     }
