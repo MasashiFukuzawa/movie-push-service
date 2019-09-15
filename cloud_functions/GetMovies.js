@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-let page;
+const page = await getBrowserPage();
 
 async function getBrowserPage() {
   // Launch headless Chrome. Turn off sandbox so Chrome can run under root.
@@ -7,12 +7,7 @@ async function getBrowserPage() {
   return browser.newPage();
 }
 
-exports.getMovies = async (req, res) => {
-
-  if (!page) {
-    page = await getBrowserPage();
-  }
-
+exports.getMovies = async (_, res) => {
   const url = 'https://eiga.com/coming/';
   await page.goto(url, {waitUntil: 'load'});
 
@@ -37,8 +32,6 @@ exports.getMovies = async (req, res) => {
 function getMovies() {
   const base_section = document.querySelector('section');
   const elements = base_section.children;
-  // LINEに通知したかどうかのフラグ
-  const line_flag = 0;
 
   let movies = [];
   for (let i = 0; i < elements.length; i++) {
@@ -56,16 +49,22 @@ function getMovies() {
       if (!cast_list) {
         cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(1)');
       }
-      const cast1 = cast_list.querySelector('span:nth-child(1)') ? cast_list.querySelector('span:nth-child(1)').textContent : '';
-      const cast2 = cast_list.querySelector('span:nth-child(2)') ? cast_list.querySelector('span:nth-child(2)').textContent : '';
-      const cast3 = cast_list.querySelector('span:nth-child(3)') ? cast_list.querySelector('span:nth-child(3)').textContent : '';
-      const cast4 = cast_list.querySelector('span:nth-child(4)') ? cast_list.querySelector('span:nth-child(4)').textContent : '';
-      const cast5 = cast_list.querySelector('span:nth-child(5)') ? cast_list.querySelector('span:nth-child(5)').textContent : '';
+      casts = Array.from({length: 5}).map((_, j) =>
+        cast_list.querySelector(`span:nth-child(${j + 1})`) ? cast_list.querySelector(`span:nth-child(${j + 1})`).textContent : ''
+      );
 
       let description = elements[i].querySelector('.txt').textContent;
       let src = elements[i].querySelector('.img-box > a > img').src;
 
-      let movie = {release_date, title, href, cast1, cast2, cast3, cast4, cast5, description, src, line_flag};
+      let movie = {
+        release_date: release_date,
+        title: title,
+        href: href,
+        casts: casts,
+        description: description,
+        src: src,
+        line_flag: 0, // LINEに通知したかどうかのフラグ
+      }
       movies.push(movie);
       this.movies = movies
     }
