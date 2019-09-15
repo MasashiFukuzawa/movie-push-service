@@ -51,21 +51,21 @@ function getMovies() {
       let title = a.textContent;
       let href = a.href;
 
-      // キャストを5人分取得
+      // NOTE: 映画.comのHTMLの構造上の都合により
       let cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(2)');
       if (!cast_list) {
         cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(1)');
       }
-      let casts = [];
-      for (let i = 1; i <= 5; i++) {
-        let cast = cast_list.querySelector(`span:nth-child(${i})`) ? cast_list.querySelector(`span:nth-child(${i})`).textContent : '';
-        casts.push(cast);
-      }
+      const cast1 = cast_list.querySelector('span:nth-child(1)') ? cast_list.querySelector('span:nth-child(1)').textContent : '';
+      const cast2 = cast_list.querySelector('span:nth-child(2)') ? cast_list.querySelector('span:nth-child(2)').textContent : '';
+      const cast3 = cast_list.querySelector('span:nth-child(3)') ? cast_list.querySelector('span:nth-child(3)').textContent : '';
+      const cast4 = cast_list.querySelector('span:nth-child(4)') ? cast_list.querySelector('span:nth-child(4)').textContent : '';
+      const cast5 = cast_list.querySelector('span:nth-child(5)') ? cast_list.querySelector('span:nth-child(5)').textContent : '';
 
       let description = elements[i].querySelector('.txt').textContent;
       let src = elements[i].querySelector('.img-box > a > img').src;
 
-      let movie = {release_date, title, href, ...casts, description, src, line_flag};
+      let movie = {release_date, title, href, cast1, cast2, cast3, cast4, cast5, description, src, line_flag};
       movies.push(movie);
       this.movies = movies
     }
