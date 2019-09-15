@@ -51,7 +51,7 @@ function getMovies() {
       let title = a.textContent;
       let href = a.href;
 
-      // NOTE: 映画.comのHTMLの構造上の都合により
+      // NOTE: 映画.comのHTMLの構造上の都合によりli:nth-child(2)がない時があるため分岐
       let cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(2)');
       if (!cast_list) {
         cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(1)');
