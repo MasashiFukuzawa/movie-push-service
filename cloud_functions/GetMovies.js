@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const page = await getBrowserPage();
 
 async function getBrowserPage() {
   // Launch headless Chrome. Turn off sandbox so Chrome can run under root.
@@ -8,7 +7,12 @@ async function getBrowserPage() {
 }
 
 exports.getMovies = async (_, res) => {
-  const url = 'https://eiga.com/coming/';
+  const page = await getBrowserPage();
+
+  const date = new Date();
+  const year  = date.getFullYear(),
+        month = ("0"+(date.getMonth()+2)).slice(-2);
+  const url = `https://eiga.com/coming/${year}${month}/`;
   await page.goto(url, {waitUntil: 'load'});
 
   await page._client.send(
@@ -17,8 +21,9 @@ exports.getMovies = async (_, res) => {
       x: 0,
       y: 0,
       xDistance: 0,
-      yDistance: -1000,
-      repeatCount: 15,
+      yDistance: -3000,
+      speed: 1000,
+      repeatCount: 10,
       repeatDelayMs: 1,
     }
   );
@@ -26,48 +31,55 @@ exports.getMovies = async (_, res) => {
   const result = await page.evaluate(getMovies);
 
   res.set('Content-Type', 'application/json');
-  res.send(result);
+  res.send(result.filter(function(e){return e}));
 };
 
 function getMovies() {
-  const base_section = document.querySelector('section');
-  const elements = base_section.children;
+  return [...document.querySelector('section').children].map(element => {
+    if (element.tagName === 'H2') {
+      const release_date = element.querySelector('span.icon.calendar').textContent;
+      this.release_date = release_date;
+    } else if (element.tagName === 'DIV') {
+      const txt_box = element.querySelector('.txt-box');
+      const a = txt_box.querySelector('.title > a');
+      const title = a.textContent;
+      const href = a.href;
 
-  let movies = [];
-  for (let i = 0; i < elements.length; i++) {
-    if (elements[i].tagName === 'H2') {
-      let release_date = elements[i].querySelector('span.icon.calendar').textContent;
-      this.release_date = release_date
-    } else if (elements[i].tagName === 'DIV') {
-      let txt_box = elements[i].querySelector('.txt-box');
-      let a = txt_box.querySelector('.title > a');
-      let title = a.textContent;
-      let href = a.href;
-
-      // NOTE: 映画.comのHTMLの構造上の都合によりli:nth-child(2)がない時があるため分岐
-      let cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(2)');
-      if (!cast_list) {
-        cast_list = elements[i].querySelector('ul.cast-staff > li:nth-child(1)');
-      }
-      casts = Array.from({length: 5}).map((_, j) =>
-        cast_list.querySelector(`span:nth-child(${j + 1})`) ? cast_list.querySelector(`span:nth-child(${j + 1})`).textContent : ''
+      // NOTE: 映画.comのHTMLの構造上の都合によりli:nth-child(2)がない時があるのでエラーを吐かないように対処
+      const cast_staff = Array.from({length: 2}).map((_, j) =>
+        element.querySelector(`ul.cast-staff > li:nth-child(${j + 1})`)
       );
 
-      let description = elements[i].querySelector('.txt').textContent;
-      let src = elements[i].querySelector('.img-box > a > img').src;
+      let casts;
+      if (cast_staff[1]) {
+        casts = Array.from({length: 5}).map((_, k) =>
+          cast_staff[1].querySelector(`span:nth-child(${k + 1})`) ? cast_staff[1].querySelector(`span:nth-child(${k + 1})`).textContent : ''
+        );
+      } else if (cast_staff[0]) {
+        casts = Array.from({length: 5}).map((_, k) =>
+          cast_staff[0].querySelector(`span:nth-child(${k + 1})`) ? cast_staff[0].querySelector(`span:nth-child(${k + 1})`).textContent : ''
+        );
+      } else {
+        casts = [];
+      }
 
-      let movie = {
+      const description = element.querySelector('.txt') ? element.querySelector('.txt').textContent : '';
+      const src = element.querySelector('.img-box > a > img').src;
+
+      const movie = {
         release_date: release_date,
         title: title,
         href: href,
-        casts: casts,
+        cast1: casts[0] || '',
+        cast2: casts[1] || '',
+        cast3: casts[2] || '',
+        cast4: casts[3] || '',
+        cast5: casts[4] || '',
         description: description,
         src: src,
-        line_flag: 0, // LINEに通知したかどうかのフラグ
-      }
-      movies.push(movie);
-      this.movies = movies
+        line_flag: 0,
+      };
+      return movie;
     }
-  }
-  return movies;
+  });
 }
