@@ -7,7 +7,6 @@ var TO = '<YOUR GMAIL ADDRESS>';
 var LOG_SHEET_URL = '<YOUR LOG SHEET URL>';
 
 function pushMessages() {
-  // LINE developersのメッセージ送受信に必要なトークンなど
   const URL = "https://api.line.me/v2/bot/message/push";
 
   var ss = SpreadsheetApp.openById('<YOUR SPREAD SHEET ID>');
