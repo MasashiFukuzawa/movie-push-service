@@ -22,10 +22,10 @@ function pushNewArrival() {
   const movies = getMovies(false);
 
   // 未通知の映画を全件送信する
-  for (i = 0; i < movies.length; i++) {
+  for (var i = 0; i < movies.length; i++) {
     try {
-      const postData = getPostData(movies[i], false);
-      const options = {
+      var postData = getPostData(movies[i], false);
+      var options = {
         "method": "post",
         "headers": HEADERS,
         "payload": JSON.stringify(postData)
@@ -45,18 +45,18 @@ function pushNewArrival() {
   }
 
   if (errorCount >= 1) {
-    MailApp.sendEmail(MY_GMAIL, '[ERROR] 新着映画情報bot', '下記URLからエラー内容を確認し、対応して下さい。' + '\n' + LOG_SHEET_URL);
+    MailApp.sendEmail(MY_GMAIL, '[ERROR] LINEプッシュ通知', '下記URLからエラー内容を確認し、対応して下さい。' + '\n' + LOG_SHEET_URL);
   }
 }
 
 function pushReminder() {
   const movies = getMovies(true);
 
-  // 未通知の映画を全件送信する
-  for (i = 0; i < movies.length; i++) {
+  // 公開1週間前の映画を全て送信する
+  for (var i = 0; i < movies.length; i++) {
     try {
-      const postData = getPostData(movies[i], true);
-      const options = {
+      var postData = getPostData(movies[i], true);
+      var options = {
         "method": "post",
         "headers": HEADERS,
         "payload": JSON.stringify(postData)
@@ -73,7 +73,7 @@ function pushReminder() {
   }
 
   if (errorCount >= 1) {
-    MailApp.sendEmail(MY_GMAIL, '[ERROR] 新着映画情報bot', '下記URLからエラー内容を確認し、対応して下さい。' + '\n' + LOG_SHEET_URL);
+    MailApp.sendEmail(MY_GMAIL, '[ERROR] LINEプッシュ通知', '下記URLからエラー内容を確認し、対応して下さい。' + '\n' + LOG_SHEET_URL);
   }
 }
 
@@ -82,7 +82,7 @@ function getMovies(reminderFlag) {
   const allMovies = ws.getRange(2, 1, lastRow, 11).getValues();
 
   var movies = [];
-  for (i = 0; i < allMovies.length; i++) {
+  for (var i = 0; i < allMovies.length; i++) {
     var releaseDate = allMovies[i][0],
         pushStatus  = allMovies[i][10];
 
@@ -204,13 +204,19 @@ function createEvents(e) {
 
 function replyMessage(e) {
   const REPLY_URL = "https://api.line.me/v2/bot/message/reply";
+
+  const data  = e.postback.data;
+  const date  = new Date(data.slice(5, 15)).toLocaleString().slice(5, 10);
+  const title = data.substr(22);
+
   const postData = {
     "replyToken": e.replyToken,
     "messages": [{
         "type": "text",
-        "text": e.type == "message" ? e.source.userId : "カレンダーに登録しました！",
+        "text": e.type == "message" ? e.source.userId : '【' + date + '公開】' + title + ' をカレンダーに登録しました！',
       }]
   };
+
   const options = {
     "method": "post",
     "headers": HEADERS,
