@@ -15,16 +15,20 @@ exports.getMovies = async (_, res) => {
   const url = `https://eiga.com/coming/${year}${month}/`;
   await page.goto(url, {waitUntil: 'load'});
 
+  // NOTE: 画像のsrcが読み込めない問題への対策
+  // 一度画面をスクロールしてからスクレイピングすれば画像のsrcが正しく読み込める
+  // 参考1: https://wiki.zegnat.net/cache/?md5=f7ce4fd73de0ac41f15ea708b4c8f20f
+  // 参考2: https://thr3a.hatenablog.com/entry/20190215/1550190060
   await page._client.send(
     'Input.synthesizeScrollGesture',
     {
       x: 0,
       y: 0,
       xDistance: 0,
-      yDistance: -3000,
-      speed: 1000,
-      repeatCount: 10,
-      repeatDelayMs: 1,
+      yDistance: -3000, // 適当
+      speed: 1000,      // スクロール速度が1500以上だと画像が取得できない場合があった
+      repeatCount: 10,  // 画面があまりに長すぎなければスクロール10回以内でフッターまで到達する
+      repeatDelayMs: 1, // 適当
     }
   );
 
@@ -45,23 +49,26 @@ function getMovies() {
       const title = a.textContent;
       const href = a.href;
 
+      // HACK: getCasts(element)のような形で関数に切り出したいが、呼び出し時にエラーが出て上手く行かなかったため保留
+      //----------------------------------------------------------------------------------------------------------------
       // NOTE: 映画.comのHTMLの構造上の都合によりli:nth-child(2)がない時があるのでエラーを吐かないように対処
-      const cast_staff = Array.from({length: 2}).map((_, j) =>
-        element.querySelector(`ul.cast-staff > li:nth-child(${j + 1})`)
+        const cast_staff = Array.from({length: 2}).map((_, i) =>
+        element.querySelector(`ul.cast-staff > li:nth-child(${i + 1})`)
       );
 
       let casts;
       if (cast_staff[1]) {
-        casts = Array.from({length: 5}).map((_, k) =>
-          cast_staff[1].querySelector(`span:nth-child(${k + 1})`) ? cast_staff[1].querySelector(`span:nth-child(${k + 1})`).textContent : ''
+        casts = Array.from({length: 5}).map((_, j) =>
+          cast_staff[1].querySelector(`span:nth-child(${j + 1})`) ? cast_staff[1].querySelector(`span:nth-child(${j + 1})`).textContent : ''
         );
       } else if (cast_staff[0]) {
-        casts = Array.from({length: 5}).map((_, k) =>
-          cast_staff[0].querySelector(`span:nth-child(${k + 1})`) ? cast_staff[0].querySelector(`span:nth-child(${k + 1})`).textContent : ''
+        casts = Array.from({length: 5}).map((_, j) =>
+          cast_staff[0].querySelector(`span:nth-child(${j + 1})`) ? cast_staff[0].querySelector(`span:nth-child(${j + 1})`).textContent : ''
         );
       } else {
         casts = [];
       }
+      //----------------------------------------------------------------------------------------------------------------
 
       const description = element.querySelector('.txt') ? element.querySelector('.txt').textContent : '';
       const src = element.querySelector('.img-box > a > img').src;
