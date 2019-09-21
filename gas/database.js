@@ -24,8 +24,9 @@ function cleanSpreadSheet() {
     }
 
     // allMoviesの配列中に同titleがあれば削除
-    if (duplicateDataPresent(allMovies, movieTitles, title, i)) {
-      allMovies.splice(i, 1);
+    if (duplicateDataPresent(movieTitles, title, i)['bool']) {
+      var index = duplicateDataPresent(movieTitles, title, i)['index'];
+      allMovies = spliceMovie(allMovies, i, index);
       movieNum--;
       i--;
     }
@@ -37,7 +38,9 @@ function cleanSpreadSheet() {
 
   // 一度シートを全消しした後、必要なデータだけを再度セットしていく
   ws.clearContents();
-  ws.getRange(1, 1, 1, cols).setValues([['公開予定日', 'タイトル', 'URL', 'キャスト', '', '', '', '', 'あらすじ', '画像URL', 'LINE通知']]);
+  ws.getRange(1, 1, 1, cols).setValues([
+    ['公開予定日', 'タイトル', 'URL', 'キャスト', '', '', '', '', '画像URL', 'LINE新着通知', 'LINE公開直前通知', 'カレンダー登録']
+  ]);
   range.setValues(allMovies);
 }
 
@@ -48,17 +51,20 @@ function releaseDateNotFixed(date) {
   return false
 }
 
-function duplicateDataPresent(movies, titles, title, i) {
+function duplicateDataPresent(titles, title, i) {
   const index = titles.indexOf(title);
   // 同一映画データを古い方から削除することで、imageUrlが取得できていなかったものについてアップデートが可能となる
   if (index !== i) {
-    const oldLinePushStatus = movies[i][10];
-    if (oldLinePushStatus === 1) {
-      // 古いデータ削除する前に、古いデータのLINE通知フラグを新しい方の映画データに引き継がせておく必要がある
-      // movies[index][10]はnewLinePushStatusを意味している
-      movies[index][10] = oldLinePushStatus;
-    }
-    return true;
+    return {index: index, bool: true};
   }
-  return false;
+  return {bool: false};
+}
+
+function spliceMovie(movies, i, index) {
+  // 古いデータ削除する前に、古いデータの各種フラグを新しい方の映画データに引き継がせておく必要がある
+  movies[i][9] = movies[index][9];
+  movies[i][10] = movies[index][10];
+  movies[i][11] = movies[index][11];
+  movies.splice(i, 1);
+  return movies;
 }
