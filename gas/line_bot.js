@@ -39,7 +39,7 @@ function pushNewArrival() {
 
     // LINE新着通知ステータスを1に切り替える
     for (var i = 0; i < movies.length; i++) {
-      ws.getRange(movies[i]['row'], 11).setValue(1);
+      ws.getRange(movies[i]['row'], 10).setValue(1);
     }
   } catch(error) {
     logSheet.getRange(logSheetLastRow + 1, 1).setValue(now.toLocaleString().slice(0, 18));
@@ -47,7 +47,7 @@ function pushNewArrival() {
     logSheet.getRange(logSheetLastRow + 1, 3).setValue(error);
     for (var i = 0; i < movies.length; i++) {
       // エラーの場合はLINE新着通知ステータスを2に切り替える
-      ws.getRange(movies[i]['row'], 11).setValue(2);
+      ws.getRange(movies[i]['row'], 10).setValue(2);
     }
     MailApp.sendEmail(MY_GMAIL, '[ERROR] LINEプッシュ通知', ERROR_MAIL_BODY);
   }
@@ -73,7 +73,7 @@ function pushReminder() {
 
     // LINE公開直前通知ステータスを1に切り替える
     for (var i = 0; i < movies.length; i++) {
-      ws.getRange(movies[i]['row'], 12).setValue(1);
+      ws.getRange(movies[i]['row'], 11).setValue(1);
     }
   } catch(error) {
     logSheet.getRange(logSheetLastRow + 1, 1).setValue(now.toLocaleString().slice(0, 18));
@@ -81,7 +81,7 @@ function pushReminder() {
     logSheet.getRange(logSheetLastRow + 1, 3).setValue(error);
     for (var i = 0; i < movies.length; i++) {
       // エラーの場合はLINE公開直前通知ステータスを2に切り替える
-      ws.getRange(movies[i]['row'], 12).setValue(2);
+      ws.getRange(movies[i]['row'], 11).setValue(2);
     }
     MailApp.sendEmail(MY_GMAIL, '[ERROR] LINEリマインダー通知', ERROR_MAIL_BODY);
   }
@@ -131,8 +131,7 @@ function getMovieDict(movies, movie, i, releaseDate) {
   dict['cast3']       = movie[5];
   dict['cast4']       = movie[6];
   dict['cast5']       = movie[7];
-  dict['description'] = movie[8];
-  dict['imageUrl']    = movie[9];
+  dict['imageUrl']    = movie[8];
   movies.push(dict);
   return movies;
 }

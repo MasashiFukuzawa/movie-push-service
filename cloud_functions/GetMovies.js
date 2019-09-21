@@ -70,7 +70,6 @@ function getMovies() {
       }
       //----------------------------------------------------------------------------------------------------------------
 
-      const description = element.querySelector('.txt') ? element.querySelector('.txt').textContent : '';
       const src = element.querySelector('.img-box > a > img').src;
 
       const movie = {
@@ -82,7 +81,6 @@ function getMovies() {
         cast3: casts[2] || '',
         cast4: casts[3] || '',
         cast5: casts[4] || '',
-        description: description,
         src: src,
         new_arrival_flag: 0,
         just_before_release_flag: 0,
