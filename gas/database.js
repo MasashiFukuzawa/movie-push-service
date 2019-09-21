@@ -25,8 +25,7 @@ function cleanSpreadSheet() {
 
     // allMoviesの配列中に同titleがあれば削除
     if (duplicateDataPresent(allMovies, movieTitles, title, i)) {
-      var a = allMovies.splice(i, 1);
-      //Logger.log([a, i, movieNum].join(' / '));
+      allMovies.splice(i, 1);
       movieNum--;
       i--;
     }
@@ -51,15 +50,13 @@ function releaseDateNotFixed(date) {
 
 function duplicateDataPresent(movies, titles, title, i) {
   const index = titles.indexOf(title);
-  // 同一映画データを古い方から削除することで、imageUrlが取得できていなかったものや、公開日が未定だったものについてアップデートが可能となる
+  // 同一映画データを古い方から削除することで、imageUrlが取得できていなかったものについてアップデートが可能となる
   if (index !== i) {
     const oldLinePushStatus = movies[i][10];
     if (oldLinePushStatus === 1) {
       // 古いデータ削除する前に、古いデータのLINE通知フラグを新しい方の映画データに引き継がせておく必要がある
       // movies[index][10]はnewLinePushStatusを意味している
-      Logger.log(movies[i]);
-      Logger.log(movies[index]);
-      movies[index][10] = 1;
+      movies[index][10] = oldLinePushStatus;
     }
     return true;
   }
