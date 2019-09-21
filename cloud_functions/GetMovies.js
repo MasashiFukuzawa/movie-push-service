@@ -84,7 +84,8 @@ function getMovies() {
         cast5: casts[4] || '',
         description: description,
         src: src,
-        line_flag: 0,
+        new_arrival_flag: 0,
+        just_before_release_flag: 0,
       };
       return movie;
     }
