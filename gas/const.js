@@ -1,7 +1,7 @@
 // 全ファイル共通の変数・定数を集約
 
 // LINE API
-var ACCESS_TOKEN = '< YOUR ACCESS_TOKEN>';
+var ACCESS_TOKEN = '<YOUR ACCESS_TOKEN>';
 var HEADERS      = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ACCESS_TOKEN};
 var PUSH_URL     = 'https://api.line.me/v2/bot/message/push';
 var REPLY_URL    = 'https://api.line.me/v2/bot/message/reply';
