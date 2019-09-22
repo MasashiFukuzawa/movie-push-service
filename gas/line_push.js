@@ -13,7 +13,7 @@ function pushNewArrival() {
     UrlFetchApp.fetch(PUSH_URL, _getPostOptions(movies, false));
 
     // LINE新着通知ステータスを1に切り替える
-    _updateLinePushStatus(movies, 10, 1);
+    _updateLinePushStatus(movies, 11, 1);
 
     // 他にも通知可能な映画があればもっと見るかのメッセージを送信
     if (moreMoviesExist) {
@@ -40,7 +40,7 @@ function pushReminder() {
   try {
     UrlFetchApp.fetch(PUSH_URL, _getPostOptions(movies, true));
 
-    _updateLinePushStatus(movies, 11, 1);
+    _updateLinePushStatus(movies, 12, 1);
 
     if (moreMoviesExist) {
       _notifyMoreMoviesExit(true);
@@ -127,13 +127,12 @@ function _getTexts(reminderFlag) {
     actionTextRight = 'また明日';
 
   }
-  const texts = {
+  return {
     altText: altText,
     msgText: msgText,
     actionTextLeft: actionTextLeft,
     actionTextRight: actionTextRight
   };
-  return texts;
 }
 
 function _outputErrorLogs(error, movies, logTitle, statusRow, mailSubject) {
@@ -163,11 +162,11 @@ function _getMovies(reminderFlag) {
       // 公開日の1週間前なら連想配列に追加
       var sevenDaysBeforeRelease = _getSevenDaysBeforeRelease(releaseDate).toLocaleString().slice(0, 10);
       var today = new Date().toLocaleString().slice(0, 10);
-      pushStatus = movie[10];
+      pushStatus = movie[11];
       movies = sevenDaysBeforeRelease === today && pushStatus === 0 ? _getMovieDict(movies, movie, i, releaseDate) : movies;
     } else {
       // LINE未通知なら連想配列に追加
-      pushStatus = movie[9];
+      pushStatus = movie[10];
       movies = pushStatus === 0 ? _getMovieDict(movies, movie, i, releaseDate) : movies;
     }
 
@@ -192,7 +191,7 @@ function _getMovieDict(movies, movie, i, releaseDate) {
   dict['cast3']       = movie[5];
   dict['cast4']       = movie[6];
   dict['cast5']       = movie[7];
-  dict['imageUrl']    = movie[8];
+  dict['imageUrl']    = movie[9];
   movies.push(dict);
   return movies;
 }
