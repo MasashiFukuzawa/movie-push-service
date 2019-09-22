@@ -84,6 +84,7 @@ function getMovies() {
         src: src,
         new_arrival_flag: 0,
         just_before_release_flag: 0,
+        google_calender_flag: 0,
       };
       return movie;
     }
