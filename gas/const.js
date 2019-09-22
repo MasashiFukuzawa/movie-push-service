@@ -8,10 +8,10 @@ var REPLY_URL    = 'https://api.line.me/v2/bot/message/reply';
 var USER_ID      = '<YOUR USER ID>';
 
 // スプレッドシート
-var ss      = SpreadsheetApp.openById('<YOUR SPREAD SHEET ID>');
-var ws      = ss.getSheetByName('DB');
-var lastRow = ws.getLastRow();
-var lastCol = ws.getLastColumn();
+var ss        = SpreadsheetApp.openById('<YOUR SPREAD SHEET ID>');
+var ws        = ss.getSheetByName('DB');
+var lastRow   = ws.getLastRow();
+var lastCol   = ws.getLastColumn();
 var allMovies = ws.getRange(2, 1, lastRow, lastCol).getValues();
 
 // CloudFunctions
