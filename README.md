@@ -14,7 +14,7 @@
 
 ## LINEに通知されるまでの流れと機能要件
 1. （GAS） Cloud Functions のエンドポイントを叩く
-2. （Cloud Functions） Puppeteer を起動し、[映画.comの公開スケジュール](https://eiga.com/coming/） から最新の映画情報を取得
+2. （Cloud Functions） Puppeteer を起動し、[映画.comの公開スケジュール](https://eiga.com/coming/) から最新の映画情報を取得
 3. （Cloud Functions） スクレイピングの結果をJSONで返却
 4. （GAS） JSONを整形してスプレッドシートに出力
 5. (GAS) スプレッドシート中のデータを定期的にLINEに送信
