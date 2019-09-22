@@ -47,9 +47,9 @@ function _createEvents(event) {
   // スプレッドシートから同一タイトルを検索
   const index = _getIndexOfSameTitle(title);
   // スプレッドシートL列にあるカレンダー登録フラグを立てる
-  ws.getRange(index + 2, 12).setValue(1);
+  ws.getRange(index + 2, 13).setValue(1);
   // カレンダー登録が成功した旨を通知
-  const text = "【" + date.toLocaleString().slice(5, 10) + "公開】" + title + " をカレンダーに登録しました！";
+  const text = '【' + date.toLocaleString().slice(5, 10) + '公開】' + title + ' をカレンダーに登録しました！';
   _replyMessage(event, text);
 }
 

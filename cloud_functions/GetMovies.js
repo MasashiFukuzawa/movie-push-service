@@ -32,61 +32,62 @@ exports.getMovies = async (_, res) => {
     }
   );
 
-  const result = await page.evaluate(getMovies);
+  const result = (await page.evaluate(getMovies)).filter(r => !!r);
 
   res.set('Content-Type', 'application/json');
-  res.send(result.filter(function(e){return e}));
+  res.send(result);
 };
 
 function getMovies() {
   return [...document.querySelector('section').children].map(element => {
     if (element.tagName === 'H2') {
-      const release_date = element.querySelector('span.icon.calendar').textContent;
-      this.release_date = release_date;
+      const releaseDate = element.querySelector('span.icon.calendar').textContent;
+      this.releaseDate = releaseDate;
     } else if (element.tagName === 'DIV') {
-      const txt_box = element.querySelector('.txt-box');
-      const a = txt_box.querySelector('.title > a');
-      const title = a.textContent;
-      const href = a.href;
+      const txtBox = element.querySelector('.txt-box');
+      const linkTag = txtBox.querySelector('.title > a');
+      const title = linkTag.textContent;
+      const href = linkTag.href;
 
       // HACK: getCasts(element)のような形で関数に切り出したいが、呼び出し時にエラーが出て上手く行かなかったため保留
       //----------------------------------------------------------------------------------------------------------------
       // NOTE: 映画.comのHTMLの構造上の都合によりli:nth-child(2)がない時があるのでエラーを吐かないように対処
-        const cast_staff = Array.from({length: 2}).map((_, i) =>
+      const castStaff = Array.from({length: 2}).map((_, i) =>
         element.querySelector(`ul.cast-staff > li:nth-child(${i + 1})`)
       );
 
       let casts;
-      if (cast_staff[1]) {
+      if (castStaff[1]) {
         casts = Array.from({length: 5}).map((_, j) =>
-          cast_staff[1].querySelector(`span:nth-child(${j + 1})`) ? cast_staff[1].querySelector(`span:nth-child(${j + 1})`).textContent : ''
+          castStaff[1].querySelector(`span:nth-child(${j + 1})`) ? castStaff[1].querySelector(`span:nth-child(${j + 1})`).textContent : ''
         );
-      } else if (cast_staff[0]) {
+      } else if (castStaff[0]) {
         casts = Array.from({length: 5}).map((_, j) =>
-          cast_staff[0].querySelector(`span:nth-child(${j + 1})`) ? cast_staff[0].querySelector(`span:nth-child(${j + 1})`).textContent : ''
+          castStaff[0].querySelector(`span:nth-child(${j + 1})`) ? castStaff[0].querySelector(`span:nth-child(${j + 1})`).textContent : ''
         );
       } else {
         casts = [];
       }
       //----------------------------------------------------------------------------------------------------------------
 
+      const description = element.querySelector('.txt') ? element.querySelector('.txt').textContent : '';
       const src = element.querySelector('.img-box > a > img').src;
 
-      const movie = {
-        release_date: release_date,
-        title: title,
-        href: href,
+      return {
+        releaseDate,
+        title,
+        href,
         cast1: casts[0] || '',
         cast2: casts[1] || '',
         cast3: casts[2] || '',
         cast4: casts[3] || '',
         cast5: casts[4] || '',
-        src: src,
-        new_arrival_flag: 0,
-        just_before_release_flag: 0,
-        google_calender_flag: 0,
+        description,
+        src,
+        newArrivalFlag: 0,
+        justBeforeReleaseFlag: 0,
+        googleCalenderFlag: 0,
       };
-      return movie;
     }
   });
 }
