@@ -1,10 +1,4 @@
 function cleanSpreadSheet() {
-  const ss = SpreadsheetApp.openById('<YOUR SPREAD SHEET ID>');
-  const ws = ss.getSheetByName('DB');
-  const lastRow = ws.getLastRow();
-  const lastCol = ws.getLastColumn();
-
-  var allMovies = ws.getRange(2, 1, lastRow - 1, lastCol).getValues();
   var movieNum  = allMovies.length;
 
   const movieTitles = allMovies.map(function(movie) {
@@ -16,7 +10,7 @@ function cleanSpreadSheet() {
     var title = allMovies[i][1];
 
     // allMoviesのうち、A列がDate型でないものを配列から削除
-    if (releaseDateNotFixed(date)) {
+    if (_releaseDateNotFixed(date)) {
       allMovies.splice(i, 1);
       movieNum--;
       i--;
@@ -24,14 +18,52 @@ function cleanSpreadSheet() {
     }
 
     // allMoviesの配列中に同titleがあれば削除
-    if (duplicateDataPresent(movieTitles, title, i)['bool']) {
-      var index = duplicateDataPresent(movieTitles, title, i)['index'];
-      allMovies = spliceMovie(allMovies, i, index);
+    if (_duplicateDataPresent(movieTitles, title, i)['bool']) {
+      var index = _duplicateDataPresent(movieTitles, title, i)['index'];
+      allMovies = _spliceMovie(allMovies, i, index);
       movieNum--;
       i--;
     }
   }
 
+  _updateSpreadSheet(allMovies);
+}
+
+// 以下、プライベートメソッド
+//--------------------------------------------------------------------------------------
+
+function _releaseDateNotFixed(date) {
+  if(Object.prototype.toString.call(date).slice(8, -1) !== 'Date'){
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function _duplicateDataPresent(titles, title, i) {
+  const index = titles.indexOf(title);
+  // 同一映画データを古い方から削除することで、imageUrlが取得できていなかったものについてアップデートが可能となる
+  // ifの条件設定の意図については、下記ログを出力して挙動を確認してみると理解できる
+  //Logger.log(['スプレッドシートの行番号: ' + (i + 2), '配列中での通し番号: ' + (index + 2)].join(' / '));
+  //Logger.log([allMovies[i][1], allMovies[index][1]].join(' / '));
+  //Logger.log('----------------------------------------------------------------------------------');
+  if (index < i) {
+    return {index: index, bool: true};
+  } else {
+    return {bool: false};
+  }
+}
+
+function _spliceMovie(allMovies, i, index) {
+  // 古いデータ削除する前に、古いデータの各種フラグを新しい方の映画データに引き継がせておく必要がある
+  allMovies[i][9] = allMovies[index][9];
+  allMovies[i][10] = allMovies[index][10];
+  allMovies[i][11] = allMovies[index][11];
+  allMovies.splice(i, 1);
+  return allMovies;
+}
+
+function _updateSpreadSheet(allMovies) {
   const rows  = allMovies.length;
   const cols  = allMovies[0].length;
   const range = ws.getRange(2, 1, rows, cols);
@@ -42,29 +74,4 @@ function cleanSpreadSheet() {
     ['公開予定日', 'タイトル', 'URL', 'キャスト', '', '', '', '', '画像URL', 'LINE新着通知', 'LINE公開直前通知', 'カレンダー登録']
   ]);
   range.setValues(allMovies);
-}
-
-function releaseDateNotFixed(date) {
-  if(Object.prototype.toString.call(date).slice(8, -1) !== 'Date'){
-    return true;
-  }
-  return false
-}
-
-function duplicateDataPresent(titles, title, i) {
-  const index = titles.indexOf(title);
-  // 同一映画データを古い方から削除することで、imageUrlが取得できていなかったものについてアップデートが可能となる
-  if (index !== i) {
-    return {index: index, bool: true};
-  }
-  return {bool: false};
-}
-
-function spliceMovie(movies, i, index) {
-  // 古いデータ削除する前に、古いデータの各種フラグを新しい方の映画データに引き継がせておく必要がある
-  movies[i][9] = movies[index][9];
-  movies[i][10] = movies[index][10];
-  movies[i][11] = movies[index][11];
-  movies.splice(i, 1);
-  return movies;
 }
