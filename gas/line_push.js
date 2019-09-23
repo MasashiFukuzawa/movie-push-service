@@ -52,7 +52,6 @@ function pushReminder() {
 }
 
 // 以下、プライベートメソッド
-//--------------------------------------------------------------------------------------
 
 function _getPostOptions(movies, reminderFlag) {
   const postData = _getPostData(movies, false);

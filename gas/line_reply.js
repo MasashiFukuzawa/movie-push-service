@@ -12,7 +12,6 @@ function doPost(e) {
 }
 
 // 以下、プライベートメソッド
-//--------------------------------------------------------------------------------------
 
 function _respondToMsg(event) {
   const msg = event.message.text;

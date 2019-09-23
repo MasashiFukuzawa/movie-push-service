@@ -21,14 +21,13 @@ function cleanSpreadSheet() {
     // 映画は不要なので、あらすじに「ホラー」というキーワードが入っていれば配列から削除
     if (_keywordToBeDeletedExists(description)) {
       var deletedData = allMovies.splice(i, 1);
-      Logger.log(deletedData);
       movieNum--;
       i--;
     }
 
     // allMoviesの配列中に同titleがあれば削除
     if (_duplicateDataExists(movieTitles, title, i)['bool']) {
-      var index = _duplicateDataPresent(movieTitles, title, i)['index'];
+      var index = _duplicateDataExists(movieTitles, title, i)['index'];
       allMovies = _spliceMovie(allMovies, i, index);
       movieNum--;
       i--;
