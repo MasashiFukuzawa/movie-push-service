@@ -5,8 +5,14 @@ const puppeteer = require('puppeteer');
   const page = await browser.newPage();
 
   const date = new Date();
-  const year  = date.getFullYear(),
-        month = ("0"+(date.getMonth()+2)).slice(-2);
+  let year  = date.getFullYear();
+  let month = date.getMonth() + 2;
+  if (month === 13) {
+    year++;
+    month = '01';
+  } else {
+    month = ("0"+(date.getMonth()+2)).slice(-2);
+  }
   const url = `https://eiga.com/coming/${year}${month}/`;
 
   await page.goto(url);
